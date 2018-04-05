@@ -1,9 +1,11 @@
-#! python 3
+from Communication.tcp import Tcp as comu #knihovna komunikace
+##pepa = comu('192.168.42.64',12345, encoding = 'utf8', decoding = 'utf8')
+##pepa.write("Ahoj")
+##pepa.timeout=10
+##print(pepa.read(11))
+##pepa.close()
 
 def slucovani(slovnik):
-
-
-
     return str(slovnik)##,len(str(slovnik)
 
 
@@ -16,8 +18,3 @@ def Parse(text):
         return 0
     return dic
 
-slovnik={}
-slovnik["a"]="b"
-slovnik[slovnik["a"]]="c"
-slovnik[slovnik["b"]]="abc"
-Parse(slucovani(slovnik))
