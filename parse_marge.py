@@ -10,4 +10,6 @@ def Parse(text):
         print("Wrong dict data input.")
     return dic
 
+def Marge(dictionary):
+    return str(dictionary)
 
