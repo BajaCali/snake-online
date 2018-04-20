@@ -24,17 +24,16 @@ description - stručný popis
 | map         | list of lists of chars | the game field of things on the map, for more read farther |
 | x           | int                    | width of map                                               |
 | y           | int                    | height of map                                              |
-|             |
 | snakes      | int                    | number of snakes in game                                   |
 | a           | dic                    | informations about one of the snakes                       |
 
 #### Format of snakes' dic
 
-| name in dic | format | description |
-| ----------- | ------ | ----------- |
-|name | string | name of snake |
-|color | tuple of size three | (e.g. (255, 50, 0)) in RGB format - colour of snake |
-|score | int | actual score of snake |
+| name in dic | format              | description                                         |
+| ----------- | ------------------- | --------------------------------------------------- |
+| name        | string              | name of snake                                       |
+| color       | tuple of size three | (e.g. (255, 50, 0)) in RGB format - colour of snake |
+| score       | int                 | actual score of snake                               |
 
 ## Client -> Server
 
