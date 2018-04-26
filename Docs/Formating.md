@@ -12,9 +12,13 @@ Ze serveru jdou vždy dvě zprávy po sobě, kde první obsahuje právě délku 
 ##### Legenda
 
 num - pořadí (posílání zpráv je cyklické)
+
 len - délká zprávy
+
 name - zkrácený název zprávy
+
 format of payload - formát obsahu
+
 description - stručný popis
 
 ### Format of data
@@ -25,7 +29,7 @@ description - stručný popis
 | x           | int                    | width of map                                               |
 | y           | int                    | height of map                                              |
 | snakes      | int                    | number of snakes in game                                   |
-| a           | dic                    | informations about one of the snakes                       |
+| number (int)           | dic                    | informations about one of the snakes (indexing from 1)                       |
 
 #### Format of snakes' dic
 
@@ -35,12 +39,26 @@ description - stručný popis
 | color       | tuple of size three | (e.g. (255, 50, 0)) in RGB format - colour of snake |
 | score       | int                 | actual score of snake                               |
 
+#### Format of map
+
+- jedna se o dvourozmerne pole charu
+- 256 moznosti, co posilame
+- orieantace: map[x][y]
+- sirska a vyska mapy je definovana ve slovniku s daty
+
+| char | short description              | description                                         |
+| ----------- | ------------------- | --------------------------------------------------- |
+| 101 - 255 | hadi | number of snake mentioned in data dictionary |
+| 0 | space | free space, there's nothing |
+| 1 | wall | wall, snakes can't go through |
+| 2 | apple | that's what snakes are able to eat |
+
 ## Client -> Server
 
 Dva typy zpráv:
 
-2. inicializace hada jako takového formátově podobně jako Format of snakes' dic
-1. direction formát v podobě jednoho znaku - int
+1. inicializace hada jako takového formátově podobně jako Format of snakes' dic
+2. direction formát v podobě jednoho znaku - int
     - 1 = NORTH
     - 2 = SOUTH
     - 3 = EAST
