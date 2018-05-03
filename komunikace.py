@@ -1,5 +1,5 @@
 from Communication.tcp import Client as comu #knihovna komunikace from Communication.tcp import client as server
-import pygame as pyp#mozna pygame
+import pygame#mozna pygame
 import ast
 
 ##konstanty
@@ -33,12 +33,21 @@ def Parse(text):
 #print(pepa.read(11))
 ##pepa.close()
 class uzivatel:
-    def __init__(self):
+    def __init__(self,ip,port):
+        print("Jo kolo se toci")
+        self.out = comu(ip,port, encoding = 'utf8', decoding = 'utf8',noexcept=False)
+        if (self.out.connected==False):
+            print("Pripojeni bylo neuspesne")
+        print("A prece se toci")
         self.mantisa=4
         self.delka=0
 
+
+
+        
+
     def wait(self):#ceka na mantisu
-        cmd=pepa.read(mantisa)
+        cmd=self.out.read(mantisa)
         
         if cmd=={} and int(cmd)==0:
             return False
@@ -48,19 +57,21 @@ class uzivatel:
     def lisen(self):#ceka na prijmu a vrati prijem
         self.delka=0
         
-        
-        dic = {}
-        try:
-            dic = ast.literal_eval(pepa.read(self.delka))
-        except:
-            print("Wrong dict data input.")
-            return 0
+        if self.wait():
+            dic = {}
+            try:
+                dic = ast.literal_eval(pepa.read(self.delka))
+            except:
+                print("Wrong dict data input.")
+                return 0
         return dic
 
     def odeslani(self,slovnik):
+        print(ord(str(slovnik)))
         text=slucovani(str(slovnik))
-        pepa.write(len(text))#velikoxt
-        pepa.write(text)#sprava
+        
+        self.out.write(len(text))#velikoxt
+        self.out.write(text)#sprava
 
 
 
@@ -97,7 +108,7 @@ class Grafika:
                     pygame.draw.rect(self.screen, self.barva_zdi, (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
                 if self.mapa[x][y]==chr(2):
                     pygame.draw.circle(self.screen, self.barva_cil, (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
-                if chr(pocet+100)=>self.mapa[x][y]>chr(100):  
+                if chr(pocet+100)>=self.mapa[x][y]>chr(100):  
                     pygame.draw.circle(self.screen, self.hadove[ord(self.mapa[x][y]-101)]["color"], (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
         pygame.display.flip()##mozna ma byt v mainu
 
@@ -126,53 +137,61 @@ class Grafika:
 
 #main
 
-screen = pygame.display.set_mode((width, height),)#pamatuje si obrazovku surface - screen -cokoli do ni zapisu se da prikazem vykreslit
+
+screen = pygame.display.set_mode((1500,1500))#(width, height)pamatuje si obrazovku surface - screen -cokoli do ni zapisu se da prikazem vykreslit
 konec=1
 
 pygame.time.set_timer(pygame.USEREVENT+1,int(fps))
 klavesy=[pygame.K_UP,pygame.K_DOWN,pygame.K_RIGHT,pygame.K_LEFT,pygame.K_w,pygame.K_s,pygame.K_d,pygame.K_a]
+#hrac=uzivatel('192.168.42.103',11111) # 2 michal
+hrac=uzivatel('192.168.42.69',1234)#kuba -1
 
 
+novy_smer=0
+smer=0
+##malovani=Grafika(screen,hrac.lisen())
 while(konec==1):
-    novy_smer
-    smer
+    
     event=pygame.event.wait()
 
     if(event.type==pygame.QUIT):
         konec=0
         print("By")
         break
+    #print("kolot")
     if(event.type==pygame.KEYDOWN):
-        a=event.key
-            if(button==klavesy[0] or button==klavesy[4]):
+        print("kolo")
+        button=event.key##??buton<--a
+        if(button==klavesy[0] or button==klavesy[4]):
             if(smer!=2):
                 novy_smer=1
                 #print("jsem tu")
         elif(button==(klavesy[1] or button==klavesy[4])):
             if(smer!=1):
-                novy_smer=2
+                novy_smer=3
                 #print("jsem tu")
         elif(button==(klavesy[2] or button==klavesy[4])):
             if(smer!=4):
-                novy_smer=3
+                novy_smer=4
                 #print("jsem tu")
         elif(button==(klavesy[3] or button==klavesy[4])):
             if(smer!=3):
-                novy_smer=4
+                novy_smer=2
                 #print("jsem tu")
                 #[pygame.K_UP,pygame.K_DOWN,pygame.K_RIGHT,pygame.K_LEFT]
 
 
-
-    odeslani(chr(novy_smer))
+    #print("kolo")
+    hrac.odeslani(chr(smer))
     smer=novy_smer
+    print("k")
+    ##malovani.update(screen,hrac.lisen())
 
 
+    if konec==0:
+        break
 
-        if konec==0:
-            break
-
-
+pygame.quit()
 
 
 
