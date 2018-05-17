@@ -12,10 +12,6 @@ from collections import deque
 # dic = {1: {"color": "blue", 'name': 'ahaha'}, 'nazev': 'a dict'}
 # print (Marge(dic))
 
-
-
-pygame.init()
-
 raster = 20
 window_size = (25, 25)
 
@@ -25,12 +21,10 @@ for y in range(window_size[1]):
 
 circle_size = raster // 2 - 1
 
-screen = pygame.display.set_mode((window_size[0] * raster, window_size[1] * raster))
-
 background_color = pygame.Color('black')
 
 MOVE_EVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(MOVE_EVENT, 1000//4)
+pygame.time.set_timer(MOVE_EVENT, 1000//3)
 
 UP    = 1
 DOWN  = 3
@@ -102,6 +96,7 @@ class Snake:
         coor = (x, y)
         if x < 0 or y < 0 or y >= len(self.playground) or x >= len(self.playground[y]) or isinstance(self.playground[y][x], Snake):
             self.alive = False
+            print ('Diing at [{}][{}] {}; playground size: {} {}'.format(y, x, self.playground[y][x], len(self.playground), len(self.playground[y])))
             for x, y in self.tail:
                 self.playground[y][x] = None
             return
@@ -127,71 +122,98 @@ class Snake:
     def __bool__(self):
         return self.alive
 
-# snake loop: 
-while True:
-    
-    event = pygame.event.wait()
-    if event.type == pygame.QUIT:
-        break
-    
-    elif event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_ESCAPE:
-            break
-        for snake in snakes:
-            snake.control(event.key)
-    
-    elif event.type == MOVE_EVENT:
-        for snake in snakes:
-            snake.move()
-        if not any(snakes):
-            break
-        pygame.display.set_caption('Snake' + 16 * ' ' + 'Score: {}'.format(', '.join('{:3}'.format(snake.score) for snake in snakes)))
-        redraw = True
 
-    if redraw:
-        redraw = False
-        screen.fill(background_color)
-        for snake in snakes:
-            snake.draw(screen)
-        apple.draw(screen)
-        pygame.display.flip()
+snakes = 1
+space = 3
+x0 = int(window_size[0] / 2)
+y = int(window_size[1] / 2)
+start = [(space * x + x0 - space * snakes // 2, y) for x in range(snakes)]
+colors = (pygame.color.Color('yellow'),
+          pygame.color.Color('cyan'),
+          pygame.color.Color('magenta'))
+snakes = [Snake(playground, start[i], UP, color = colors[i], keys = (UP, DOWN, LEFT , RIGHT)) for i in range(snakes)]
+
+apple = Apple(playground)
+
+redraw = True
+
+server = Server(port = 11111, timeout = 0, decoding = 'utf8', client_timeout = 0)
+
+pygame.init()
+
+screen = pygame.display.set_mode((window_size[0] * raster, window_size[1] * raster))
+
+def Game():
+    screen = pygame.display.set_mode((window_size[0] * raster, window_size[1] * raster))
+    clients = []
+    closed = []
+    post = False
+    redraw = True
+    print('Cekam na hrace!')
+    while len(clients) < len(snakes):
+        pygame.event.pump()
+        new_client = server.accept()
+        if (new_client != None):
+            clients.append(new_client)
+            clients[-1].write("Ahoj, cekame na ostatni! :-)") 
+            print("New Client! addr: {}".format(clients[-1].address))
+    pygame.event.get()
 
 
+    while(1):
+        # server things
 
-server = Server(port = 11111, timeout = 0, decoding = 'utf8')
-
-clients = []
-post = False
-
-while(1):
-    # server things
-    new_client = server.accept()    
-    if (new_client != None):
-        clients.append(new_client)
-        clients[-1].write("ahoj") 
-        print("New Client! addr: {}".format(str(clients[-1].address)))
-    if post:
+        if post:
+            for client in clients:
+                out = ""
+                client.write("{:4}".format(len(out)))
+                client.write(out)
         for client in clients:
-            out = ""
-            client.write("{:4}".format(len(out)))
-            client.write(out)
+            if not client.readable:
+                closed.append(client)
+                if len(closed) == len(snakes):
+                    print('clients disconnected.')
+                    break
+            else:
+                read = client.read(1)
+                if read:
+                    print('from {} read {}'.format(id(client), read))
+                    client.write(read)
+                    if (ord(read) > 48 and ord(read) < 53):
+                        snakes[clients.index(client)].control(int(str(read)))
+            for client in closed:
+                print('Client disconected! addr: {}'.format(client.addr))
+                clients.remove(client)
+
+        #game things
+        event  = pygame.event.poll()
+        if event.type == pygame.QUIT:
+            break            
+        
+        elif event.type == MOVE_EVENT:
+            print(playground)
+            for snake in snakes:
+                snake.move()
+            if not any(snakes):
+                print(snakes)
+                break
+            pygame.display.set_caption('Snake' + 16 * ' ' + 'Score: {}'.format(', '.join('{:3}'.format(snake.score) for snake in snakes)))
+            redraw = True
+        
+        if redraw:
+            redraw = False
+            screen.fill(background_color)
+            for snake in snakes:
+                snake.draw(screen)
+            apple.draw(screen)
+            pygame.display.flip()
+
+
+    pygame.display.quit()
+    #server.close()
     for client in clients:
-        if not client.readable:
-            closed.append(client)
-        else:
-            read = client.read()
-            if read:
-                print('from {} read {}'.format(id(client), read))
-                client.write(read)
-        for client in closed:
-            print('Client disconected! addr: {}'.format(client.addr))
-            clients.remove(client)
+        client.close()
+    print('\n\nclosed')
 
-    #game things    
-    events = pygame.event.get()
-
-
-server.close()
-for client in clients:
-    client.close()
-print('\n\nclosed')
+while True:
+    Game()
