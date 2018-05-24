@@ -44,8 +44,6 @@ class uzivatel:
         self.out = comu(ip,port, encoding = 'utf8', decoding = 'utf8',noexcept=False)
         if (self.out.connected==False):
             print("Pripojeni bylo neuspesne")
-        else:
-            print("Pripojeni bylo uspesne")
         print("A prece se toci")
         self.mantisa=4
         self.delka=0
@@ -64,24 +62,21 @@ class uzivatel:
     
     def lisen(self):#ceka na prijmu a vrati prijem
         self.delka=0
+        pole[]
+        i=0
+        pole.append()
+        while(i=='!'):
+            i=
         
-        if self.wait():
-            dic = {}
-            try:
-                dic = ast.literal_eval(pepa.read(self.delka))
-            except:
-                print("Wrong dict data input.")
-                return 0
-        return dic
+        return 
 
     def odeslani(self,slovnik):
         #print(ord(str(slovnik)))
-        text=slucovani(str(slovnik))
+        #text=slucovani(str(slovnik))
         
-        self.out.write(len(text))#velikoxt
+        #self.out.write(len(text))#velikoxt
         self.out.write(text)#sprava
-        print(len(text))
-        print(text)
+
 
 
 #################################################main.10
@@ -109,17 +104,22 @@ class Grafika:
         
     def kresli(self):
         screen.fill(cerna)
-        for y in range(self.y):
-            for x in range(self.y):
-                if self.mapa[x][y]==chr(0):
-                    pass
-                if self.mapa[x][y]==chr(1):
-                    pygame.draw.rect(self.screen, self.barva_zdi, (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
-                if self.mapa[x][y]==chr(2):
-                    pygame.draw.circle(self.screen, self.barva_cil, (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
-                if chr(pocet+100)>=self.mapa[x][y]>chr(100):  
-                    pygame.draw.circle(self.screen, self.hadove[ord(self.mapa[x][y])-101]["color"], (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
-        pygame.display.flip()##mozna ma byt v mainu
+        print(self.mapa)
+
+
+
+        
+##        for y in range(self.y):
+##            for x in range(self.y):
+##                if self.mapa[x][y]==chr(0):
+##                    pass
+##                if self.mapa[x][y]==chr(1):
+##                    pygame.draw.rect(self.screen, self.barva_zdi, (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
+##                if self.mapa[x][y]==chr(2):
+##                    pygame.draw.circle(self.screen, self.barva_cil, (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
+##                if chr(pocet+100)>=self.mapa[x][y]>chr(100):  
+##                    pygame.draw.circle(self.screen, self.hadove[ord(self.mapa[x][y])-101]["color"], (x*polomer*2,y*polomer*2,polomer*2,polomer*2),0)
+##        pygame.display.flip()##mozna ma byt v mainu
 
         
  
@@ -127,15 +127,15 @@ class Grafika:
 
 
     def update(self,dic):
-        self.mapa=dic["map"]
+        self.mapa=dic#["map"]
         self.screen=screen#Jde to
         self.polomer=10
 
-        self.hadove=[]
-        i=0
-        self.pocet=dic["snakes"]
-        for i in range(self.pocet):
-            self.hadove.append(dic[i])#slovnik ve slovniku
+        #self.hadove=[]
+        #i=0
+        #self.pocet=dic["snakes"]
+        #for i in range(self.pocet):
+        #    self.hadove.append(dic[i])#slovnik ve slovniku
 
         return 
 
@@ -154,10 +154,9 @@ r=0
 g=0
 b=0
 event=pygame.event.wait()
-
 while(konec==0):
     event=pygame.event.wait()
-    #print("kolo")
+    print("kolo")
     if(event.type==pygame.KEYDOWN):
         a=event.key
         konec=1
@@ -172,22 +171,20 @@ while(konec==0):
     pygame.display.flip()
 
 konec=1
-
 pygame.time.set_timer(pygame.USEREVENT+1,int(fps))
 
 klavesy=[pygame.K_UP,pygame.K_DOWN,pygame.K_RIGHT,pygame.K_LEFT,pygame.K_w,pygame.K_s,pygame.K_d,pygame.K_a]
+hrac=uzivatel('192.168.42.71',1234)
 #hrac=uzivatel('192.168.42.103',11111) # 2 michal
 #hrac=uzivatel('192.168.42.71',1234)#kuba -1
-#hrac=uzivatel('192.168.42.102',11111)
-hrac=uzivatel('127.0.0.1',11111)#sobe
+#hrac=uzivatel('127.0.0.1',1234)#sobe
 #init pro michamla nize
-my={'name': jmeno,"color":(r,g,b),"score":0 }
+#my={'name': jmeno,"color":(r,g,b),"score":0 }
 
-if (hrac.out.connected):
-    print("pripojeno")
-hrac.odeslani(my)
+
+#hrac.odeslani(my)
 novy_smer=0
-
+hrac.odeslani("w")
 smer=0
 malovani=Grafika(screen,hrac.lisen())
 while(konec==1):
@@ -200,23 +197,23 @@ while(konec==1):
         break
     #print("kolot")
     if(event.type==pygame.KEYDOWN):
-        print("kolotoce")
+        print("kolo")
         button=event.key##??buton<--a
         if(button==klavesy[0] or button==klavesy[4]):
             if(smer!=2):
-                novy_smer=1
+                novy_smer="w"
                 #print("jsem tu")
         elif(button==(klavesy[1] or button==klavesy[4])):
             if(smer!=1):
-                novy_smer=3
+                novy_smer="s"
                 #print("jsem tu")
         elif(button==(klavesy[2] or button==klavesy[4])):
             if(smer!=4):
-                novy_smer=4
+                novy_smer="a"
                 #print("jsem tu")
         elif(button==(klavesy[3] or button==klavesy[4])):
             if(smer!=3):
-                novy_smer=2
+                novy_smer="d"
                 #print("jsem tu")
                 #[pygame.K_UP,pygame.K_DOWN,pygame.K_RIGHT,pygame.K_LEFT]
 
