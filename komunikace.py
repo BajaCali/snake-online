@@ -55,9 +55,9 @@ class uzivatel:
         
 
     def wait(self):#ceka na mantisu
-        cmd=self.out.read(self.mantisa)
-        
-        if cmd=={} and int(cmd)==0:
+        cmd="0"
+        cmd+=(self.out.read(self.mantisa))
+        if int(cmd)==0:
             return False
         self.delka=int(cmd)
         return True
@@ -72,13 +72,14 @@ class uzivatel:
             except:
                 print("Wrong dict data input.")
                 return 0
+        print (dic)
         return dic
 
     def odeslani(self,slovnik):
         #print(ord(str(slovnik)))
         text=slucovani(str(slovnik))
         
-        self.out.write(len(text))#velikoxt
+        self.out.write("{:4}".format(len(text)))#velikoxt
         self.out.write(text)#sprava
         print(len(text))
         print(text)
@@ -98,6 +99,7 @@ class Grafika:
         self.screen=screen#Jde to
         self.polomer=10
 
+
         self.hadove=[]
         i=0
         self.pocet=dic["snakes"]
@@ -106,7 +108,9 @@ class Grafika:
 
         self.barva_zdi=(150,150,0)
         self.barva_cil=(250,50,50)
-        
+    def vyber(self):
+        pass
+            
     def kresli(self):
         screen.fill(cerna)
         for y in range(self.y):
@@ -140,6 +144,7 @@ class Grafika:
         return 
 
 
+
 #main
 print("Jmeno hada:",end="")
 jmeno=input()
@@ -148,44 +153,49 @@ print (jmeno)
 screen = pygame.display.set_mode((velikos_x,velikost_y))#(width, height)pamatuje si obrazovku surface - screen -cokoli do ni zapisu se da prikazem vykreslit
 konec=0
 
-pygame.time.set_timer(pygame.USEREVENT+1,100)
+pygame.time.set_timer(pygame.USEREVENT+1,50)
 text = pygame.font.SysFont('arial', 50)#
-r=0
-g=0
-b=0
+i=1
 event=pygame.event.wait()
-
+duha=pygame.Color(1,1,1)
 while(konec==0):
     event=pygame.event.wait()
     #print("kolo")
     if(event.type==pygame.KEYDOWN):
         a=event.key
         konec=1
-    pygame
-    r+=17
-    g+=19
-    b+=23
-    r=r%255
-    g=g%255
-    b=b%255
-    pygame.draw.circle(screen, (r,b,g), (int(velikos_x/2),int(velikost_y/2)),500)
+    
+    i=i+1 
+    pygame.display.flip()
+    
+    duha.hsla=(i%360,100,50,0)
+            
+    pygame.draw.circle(screen, duha, (int(velikos_x/2),int(velikost_y/2)),500)
     pygame.display.flip()
 
 konec=1
+r=duha.r
+g=duha.g
+b=duha.b
 
 pygame.time.set_timer(pygame.USEREVENT+1,int(fps))
 
 klavesy=[pygame.K_UP,pygame.K_DOWN,pygame.K_RIGHT,pygame.K_LEFT,pygame.K_w,pygame.K_s,pygame.K_d,pygame.K_a]
 #hrac=uzivatel('192.168.42.103',11111) # 2 michal
 #hrac=uzivatel('192.168.42.71',1234)#kuba -1
-#hrac=uzivatel('192.168.42.102',11111)
-hrac=uzivatel('127.0.0.1',11111)#sobe
+hrac=uzivatel('192.168.42.103',11111)
+#hrac=uzivatel('127.0.0.1',11111)#sobe
 #init pro michamla nize
 my={'name': jmeno,"color":(r,g,b),"score":0 }
-
+hrac.odeslani(my)
 if (hrac.out.connected):
     print("pripojeno")
-hrac.odeslani(my)
+
+while (len(hrac.lisen())>0):
+    print("pripojuji")
+    pass# Co kdyz to bude servru trvat?
+    #neprijemnost si pripojovanim
+
 novy_smer=0
 
 smer=0
